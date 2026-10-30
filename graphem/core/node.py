@@ -11,6 +11,7 @@ class Node:
     pos:Position = field(default_factory=Position)
 
     colour:Colour = field(default_factory=Colour)
+    radius:float = 10
     label:str = ""
 
     attributes:dict = field(default_factory=dict)

@@ -50,6 +50,17 @@ class PygameRenderer:
                 2
             )
 
+
+        for edge_group in graph.edges.values():
+            for edge in edge_group.values():
+                pygame.draw.line(
+                    surface,
+                    self._get_edge_colour(edge).val,
+                    graph.nodes.get(edge.source).pos.val,
+                    graph.nodes.get(edge.target).pos.val,
+                    self.edge_width
+                )
+
         for node in graph.nodes.values():
             pygame.draw.circle(
                 surface,
@@ -68,16 +79,6 @@ class PygameRenderer:
                     node.pos.val,
                     node.radius + 2,
                     1
-                )
-
-        for edge_group in graph.edges.values():
-            for edge in edge_group.values():
-                pygame.draw.line(
-                    surface,
-                    self._get_edge_colour(edge).val,
-                    graph.nodes.get(edge.source).pos.val,
-                    graph.nodes.get(edge.target).pos.val,
-                    self.edge_width
                 )
 
         if edge_creation_nodes:

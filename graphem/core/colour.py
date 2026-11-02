@@ -28,3 +28,7 @@ class Colour:
         object.__setattr__(self, "r", r)
         object.__setattr__(self, "r", r)
         object.__setattr__(self, "r", r)
+
+
+def to_css(colour:Colour) -> str:
+    return f"rgb({colour.r}, {colour.g}, {colour.b})"

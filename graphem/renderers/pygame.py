@@ -1,10 +1,11 @@
 from collections.abc import Hashable
-from math import hypot
 import pygame
 
 from ..core.graph import Graph
+from ..core.edge import Edge
+from ..core.node import Node
 from ..core.colour import Colour
-from ..core.position import Position
+from ..core.position import Position, postuple
 
 
 class PygameRenderer:
@@ -16,7 +17,9 @@ class PygameRenderer:
              surface:pygame.surface,
              graph:Graph,
              selected_nodes:set[Hashable] = None,
-             selection_rect:tuple[Position,Position] = None) -> None:
+             selection_rect:tuple[Position,Position] = None,
+             edge_creation_nodes:list[Position] = None,
+             cursor_position:Position = None) -> None:
 
         border_colour = Colour(200, 150, 100)
         selected_colour = Colour(220, 220, 255)
@@ -50,7 +53,7 @@ class PygameRenderer:
         for node in graph.nodes.values():
             pygame.draw.circle(
                 surface,
-                border_colour.val,
+                self._get_node_colour(node).val,
                 node.pos.val,
                 node.radius,
                 3
@@ -71,8 +74,30 @@ class PygameRenderer:
             for edge in edge_group.values():
                 pygame.draw.line(
                     surface,
-                    line_colour.val,
+                    self._get_edge_colour(edge).val,
                     graph.nodes.get(edge.source).pos.val,
                     graph.nodes.get(edge.target).pos.val,
                     self.edge_width
                 )
+
+        if edge_creation_nodes:
+            for nodepos in edge_creation_nodes:
+                pygame.draw.line(
+                    surface,
+                    line_colour.val,
+                    nodepos.val,
+                    cursor_position.val,
+                    self.edge_width
+                )
+
+    @staticmethod
+    def _get_edge_colour(edge:Edge) -> Colour:
+        return edge.colour
+    def set_get_edge_colour(self, fun):
+        self._get_edge_colour = fun
+
+    @staticmethod
+    def _get_node_colour(node:Node) -> Colour:
+        return node.colour
+    def set_get_node_colour(self, fun):
+        self._get_node_colour = fun

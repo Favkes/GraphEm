@@ -15,4 +15,5 @@ class Node:
     label:str = ""
 
     attributes:dict = field(default_factory=dict)
+    origin_key:Hashable|None = None
 

@@ -21,6 +21,7 @@ class Edge:
     colour:Colour = field(default_factory=Colour)
 
     attributes:dict = field(default_factory=dict)
+    origin_key:Hashable|None = None
 
 
 def edge_identity(edge:Edge, directed:bool):

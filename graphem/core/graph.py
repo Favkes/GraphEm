@@ -6,6 +6,7 @@ from .colour import Colour
 from .position import Position
 from .node import Node
 from .edge import Edge
+from ..adapters.core import Adapter
 
 
 @dataclass(slots=True)
@@ -15,3 +16,5 @@ class Graph:
 
     directed:bool = False
     allow_parallel_edges:bool = True
+
+    origin_adapter:Adapter|None = None

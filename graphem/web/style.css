@@ -1,0 +1,29 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #111;
+    overflow: hidden;
+}
+
+#graph-canvas {
+    /* margin-left: 10vw; */
+    /* margin-top: 10vh; */
+    display: block;
+    width: 700;
+    height: 700;
+    background: #555;
+}
+
+#loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #111;
+    color: white;
+    font: 24px monospace;
+    z-index: 9999;
+}

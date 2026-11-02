@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Sequence, Hashable
+from enum import Enum
 # noinspection PyUnresolvedReferences
 from js import document, window
 from pyodide.ffi import create_proxy
@@ -9,6 +10,14 @@ from graphem.interaction.controller import GraphController, DragMode, ToolMode
 from graphem.core.graph import Graph
 from graphem.core.sync import GraphSynchronizer
 from graphem.core.position import Position
+
+
+class UserAction:
+    CREATE = "create"
+    MOVE = "move"
+    NONE = "none"
+    DELETE = "delete"
+    STEP = "step"
 
 
 class WebApp:
@@ -68,20 +77,65 @@ class WebApp:
         self.controller.mouse_up(pos, button, shift=shift)
 
     def handle_keydown(self, event):
-        key = event.key.lower()
+        actions = {
+            "c": UserAction.CREATE,
+            "m": UserAction.MOVE,
+            "p": UserAction.NONE,
+            "d": UserAction.DELETE,
+            " ": UserAction.STEP
+        }
 
-        if key == "d":
+        key = str(event.key).lower()
+
+        if key in actions:
+            if key == " ":
+                event.preventDefault()
+
+            self.handle_command(actions[key])
+
+    def handle_command(self, action:str):
+        if action == UserAction.CREATE:
+            self.controller.active_tool = ToolMode.CREATE
+
+        elif action == UserAction.MOVE:
+            self.controller.active_tool = ToolMode.MOVE
+
+        elif action == UserAction.NONE:
+            self.controller.active_tool = ToolMode.NONE
+
+        elif action == UserAction.DELETE:
             if self.controller.active_tool is not ToolMode.NONE:
                 self.controller.remove_selected_nodes()
-        elif key == "c":
-            self.controller.active_tool = ToolMode.CREATE
-        elif key == "m":
-            self.controller.active_tool = ToolMode.MOVE
-        elif key == "p":
-            self.controller.active_tool = ToolMode.NONE
-        elif key == " ":
-            event.preventDefault()
+
+        elif action ==UserAction.STEP:
             self._next_event.set()
+
+        self.update_tool_buttons()
+
+    def handle_button_click(self, event):
+        button = event.target.closest("[data-action]")
+
+        if button is None:
+            return
+
+        action = str(button.getAttribute("data-action"))
+        self.handle_command(action)
+
+    def update_tool_buttons(self):
+        active_action = {
+            ToolMode.NONE: UserAction.NONE,
+            ToolMode.MOVE: UserAction.MOVE,
+            ToolMode.CREATE: UserAction.CREATE,
+        }.get(self.controller.active_tool)
+
+        for button in document.querySelectorAll("[data-action]"):
+            action = button.getAttribute("data-action")
+
+            if action in (UserAction.NONE, UserAction.MOVE, UserAction.CREATE):
+                button.setAttribute(
+                    "aria-pressed",
+                    "true" if action == active_action else "false"
+                )
 
     # Clear screen and render new frame
     def render_frame(self):
@@ -127,6 +181,14 @@ class WebApp:
             proxy = create_proxy(handler)
             target.addEventListener(event_name, proxy)
             self._proxies.append((target, event_name, proxy))
+
+        proxy = create_proxy(self.handle_button_click)
+        document.addEventListener("click", proxy)
+        self._proxies.append(
+            (document, "click", proxy)
+        )
+
+        self.update_tool_buttons()
 
         self.running = True
 

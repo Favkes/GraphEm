@@ -4,14 +4,14 @@ import { loadPyodide } from
 
 async function main() {
     const pyodide = await loadPyodide();
-    
+
     document.getElementById("loading").remove();
     console.log("Pyodide initialized.");
 
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
 
-    const wheelUrl = new URL("../../dist/graphem-0.1.1-py3-none-any.whl", import.meta.url).href;
+    const wheelUrl = new URL("../../dist/graphem-0.1.2.4-py3-none-any.whl", import.meta.url).href;
     await micropip.install(wheelUrl);
 
     console.log("GraphEm installed! ;)");
@@ -116,6 +116,7 @@ async function main() {
 
         app = WebApp(graph, user_script=mycode)
         app.set_get_edge_colour(get_edge_colour)
+        app.set_get_node_colour(get_node_colour)
 
         await app.run()
     `);

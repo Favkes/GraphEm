@@ -10,12 +10,26 @@
 </head>
 
 <body>
-    <div>
-        <div id="loading">Loading Pyodide...</div>
-        <canvas id="graph-canvas" width="1200" height="800"></canvas>
-    </div>
-    <script type="module" src="./main.js"></script>
+    <div id="loading">Loading Pyodide...</div>
+    <main id="workspace">
+        <section id="code-panel">
+            <a>Code editor will go here!</a>
+        </section>
 
+        <section id="graph-panel">
+            <canvas id="graph-canvas" width="1200" height="800"></canvas>
+            
+            <div id="graph-controls">
+                <button type="button" id="graph-controls-button" data-action="none">None (P)</button>
+                <button type="button" id="graph-controls-button" data-action="move">Move (M)</button>
+                <button type="button" id="graph-controls-button" data-action="create">Create (C)</button>
+                <button type="button" id="graph-controls-button" data-action="delete">Delete (D)</button>
+                <button type="button" id="graph-controls-button" data-action="step">Step (Space)</button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="./main.js"></script>
 </body>
 
 </html>

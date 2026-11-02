@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from collections.abc import Iterable
+
+
+type postuple = tuple[float,float]
 
 
 @dataclass(slots=True)
@@ -8,14 +10,14 @@ class Position:
     y:float = 0
 
     @property
-    def val(self) -> tuple[float,float]:
+    def val(self) -> postuple:
         return self.x, self.y
     @val.setter
-    def val(self, val:tuple[float,float]):
+    def val(self, val:postuple):
         self.x, self.y = val
 
 
-def ttop(t:Iterable[float]|Position) -> Position:
+def ttop(t:postuple|Position) -> Position:
     # Casts any iterable or Position object to a Position object
     if isinstance(t, Position):
         return t

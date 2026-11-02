@@ -71,6 +71,12 @@ class GraphEditor:
             raise ValueError(f"Nonexistent edge: {edge_id}")
         del self.graph.edges[edge_id]
 
+    def get_free_node_id(self) -> Hashable:
+        node_id = 0
+        while node_id in self.graph.nodes:
+            node_id += 1
+        return node_id
+
     def _edge_key(self, edge:Edge) -> Hashable:
         return (
             (edge.source, edge.target)

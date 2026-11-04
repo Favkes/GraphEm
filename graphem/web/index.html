@@ -10,22 +10,53 @@
 </head>
 
 <body>
-    <div id="loading">Loading Pyodide...</div>
+    <div id="loading" style="cursor:progress">
+        <h3>Welcome to GraphEm</h3> <br>
+        Loading Pyodide...
+    </div>
+
     <main id="workspace">
         <section id="code-panel">
-            <a>Code editor will go here!</a>
+            <div style="flex-direction:row; cursor:default;">
+                <a style="margin-right:15px; color:#fff;">GraphEm</a>
+                <a style="color: #777">All your code runs locally.</a>
+            </div>
+
+            <div id="editor-picker">
+                <label for="editor-type" style="color: #bbb">Editor:</label>
+                <select id="editor-type">
+                    <option value="codemirror">CodeMirror</option>
+                    <option value="monaco">Monaco</option>
+                </select>
+            </div>
+
+            <div id="python-editor"></div>
+            <!-- <textarea id="python-editor" spellcheck="false"></textarea> -->
+
+            <div id="code-controls">
+                <button type="button" id="run-code" class="controls-button" disabled>Run</button>
+                <button type="button" id="stop-code" class="controls-button" disabled>Terminate</button>
+            </div>
         </section>
 
         <section id="graph-panel">
-            <canvas id="graph-canvas" width="1200" height="800"></canvas>
-            
-            <div id="graph-controls">
-                <button type="button" id="graph-controls-button" data-action="none">None (P)</button>
-                <button type="button" id="graph-controls-button" data-action="move">Move (M)</button>
-                <button type="button" id="graph-controls-button" data-action="create">Create (C)</button>
-                <button type="button" id="graph-controls-button" data-action="delete">Delete (D)</button>
-                <button type="button" id="graph-controls-button" data-action="step">Step (Space)</button>
-            </div>
+            <section id="graph-view">
+                <canvas id="graph-canvas" width="1200" height="800"></canvas>
+                
+                <div id="graph-controls">
+                    <button type="button" id="graph-controls-button" data-action="none">None (P)</button>
+                    <button type="button" id="graph-controls-button" data-action="move">Move (M)</button>
+                    <button type="button" id="graph-controls-button" data-action="create">Create (C)</button>
+                    <button type="button" id="graph-controls-button" data-action="delete">Delete (D)</button>
+                    <button type="button" id="graph-controls-button" data-action="step">Step (Space)</button>
+                </div>
+            </section>
+
+            <section id="console-area">
+                <div id="console-panel">
+                    <pre id="console-output"></pre>
+                </div>
+            </section>
         </section>
     </main>
 

@@ -115,7 +115,7 @@ class WebApp:
     def handle_button_click(self, event):
         button = event.target.closest("[data-action]")
 
-        if button is None:
+        if not button:
             return
 
         action = str(button.getAttribute("data-action"))

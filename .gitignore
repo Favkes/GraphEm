@@ -8,3 +8,17 @@ __pycache__/
 
 # IDE
 .idea/
+
+# Python build artifacts
+*.egg-info/
+/build/
+/dist/
+
+# Node.js dependencies
+/graphem/web/node_modules/
+
+# Vite build output
+/graphem/web/dist/
+
+# Generated Python wheel for Vite
+/graphem/web/public/dist/

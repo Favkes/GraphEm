@@ -35,13 +35,22 @@ jobs:
           python -m pip install build
           python -m build --wheel
 
-      - name: Prepare website
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: graphem/web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: graphem/web
+        run: npm ci
+      - name: Prepare Python wheel
         run: |
-          mkdir -p _site/dist
-          cp -R graphem/web/. _site/
-          cp dist/*.whl _site/dist/
-          
-          sed -i 's#../../dist/#./dist/#' _site/main.js
+          mkdir -p graphem/web/public/dist
+          cp dist/*.whl graphem/web/public/dist
+      - name: Build frontend
+        working-directory: graphem/web
+        run: npm run build
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
@@ -49,7 +58,7 @@ jobs:
       - name: Upload website
         uses: actions/upload-pages-artifact@v4
         with:
-          path: _site
+          path: graphem/web/dist
 
       - name: Deploy
         id: deployment

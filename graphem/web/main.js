@@ -11,7 +11,7 @@ async function main() {
     const micropip = pyodide.pyimport("micropip");
 
     const wheelUrl = new URL(
-        `${import.meta.env.BASE_URL}dist/graphem-0.1.2.4-py3-none-any.whl`, 
+        `${import.meta.env.BASE_URL}dist/graphem-0.1.3-py3-none-any.whl`,
         window.location.origin
     ).href;
     await micropip.install(wheelUrl);

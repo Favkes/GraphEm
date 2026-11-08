@@ -77,6 +77,9 @@ class WebApp:
         self.controller.mouse_up(pos, button, shift=shift)
 
     def handle_keydown(self, event):
+        if event.target.closest("#python-editor"):
+            return  # allow writing whitespaces in editor during execution
+
         actions = {
             "c": UserAction.CREATE,
             "m": UserAction.MOVE,

@@ -4,6 +4,7 @@ from enum import Enum
 # noinspection PyUnresolvedReferences
 from js import document, window
 from pyodide.ffi import create_proxy
+from pyodide.ffi import create_proxy, jsnull
 
 from graphem.renderers.web import WebRenderer
 from graphem.interaction.controller import GraphController, DragMode, ToolMode
@@ -118,7 +119,7 @@ class WebApp:
     def handle_button_click(self, event):
         button = event.target.closest("[data-action]")
 
-        if not button:
+        if button is None or button is jsnull:
             return
 
         action = str(button.getAttribute("data-action"))

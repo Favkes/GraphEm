@@ -17,6 +17,7 @@ from graphem.frontends.web import WebApp
 from graphem.core.edge import Edge
 from graphem.core.node import Node
 from graphem.core.colour import Colour
+import time
 
 
 # A simple recursive dfs traversal with steps every loop iteration
@@ -37,7 +38,9 @@ async def mycode(app:WebApp):
         outgoing_edges = [(e, edge) for e, edge in enumerate(edges) if node in edge and not visited_edges[e]]
         for e, edge in outgoing_edges:
             visited_edges[e] = True
-            await app.step()
+            
+            await app.step(block=False)
+            time.sleep(0.01)
 
             node1, node2 = edge
             if not visited_nodes[node1]:

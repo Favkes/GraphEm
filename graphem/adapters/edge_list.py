@@ -1,11 +1,13 @@
 from collections.abc import Hashable, Iterable, Sequence
 import random
+import math
 
 from ..adapters.core import Adapter
 from ..core.graph import Graph
 from ..core.editor import GraphEditor
 from ..core.node import Node
 from ..core.edge import Edge
+from ..core.position import Position
 
 
 class EdgeListAdapter(Adapter):
@@ -41,8 +43,17 @@ class EdgeListAdapter(Adapter):
                 )
             )
 
-        for node in graph.nodes.values():
-            node.pos.val = (random.randint(0, 700), random.randint(0, 700))
+        n_count = len(graph.nodes)
+        angle_frac = 2 * math.pi / n_count
+        radius = 250
+        center = Position(1200/2, 800/2)
+        for i, node in enumerate(graph.nodes.values()):
+            pos = (
+                center.x + math.sin(angle_frac * i) * radius,
+                center.y + math.cos(angle_frac * i) * radius
+            )
+            node.pos.val = pos
+            # node.pos.val = (random.randint(0, 700), random.randint(0, 700))
 
         return graph
 

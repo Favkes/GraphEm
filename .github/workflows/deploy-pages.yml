@@ -35,22 +35,26 @@ jobs:
           python -m pip install build
           python -m build --wheel
 
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: graphem/web/package-lock.json
+
       - name: Install frontend dependencies
         working-directory: graphem/web
         run: npm ci
+
       - name: Prepare Python wheel
         run: |
-          mkdir -p graphem/web/public/dist
-          cp dist/*.whl graphem/web/public/dist
+          bash scripts/stage-wheel.sh
+
       - name: Build frontend
         working-directory: graphem/web
         run: npm run build
+
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

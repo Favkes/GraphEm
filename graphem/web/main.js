@@ -39,6 +39,14 @@ async function main() {
     const runButton = document.getElementById("run-code");
     const stopButton = document.getElementById("stop-code");
 
+    document.addEventListener("graphem:finished", () => {
+        runButton.disabled = false;
+        stopButton.disabled = true;
+
+        console.log("Process finished.");
+        appendOutput("Process finished.");
+    });
+
     const response = await fetch("./example.py");
     if (!response.ok) {
         throw new Error("Failed to load example.py");
@@ -77,22 +85,52 @@ async function main() {
         try {
             pyodide.globals.set("editor_source", editorManager.getValue());
 
-            await pyodide.runPythonAsync(`
+            scriptOutput.textContent = "";
+            runButton.disabled = true;
+            stopButton.disabled = true;
+
+            const started = await pyodide.runPythonAsync(`
 import asyncio
+import traceback
+import sys
+from js import document, Event
 
-_run_scope = {}
-exec(compile(editor_source, "<editor>", "exec"), _run_scope)
 
-app = _run_scope["app"]
-_graph_task = asyncio.create_task(app.run())
+_started = False
 
-await asyncio.sleep(0)
+try:
+    compiled = compile(editor_source, "<editor>", "exec")
+except SyntaxError as error:
+    print("".join(traceback.format_exception_only(error)), file=sys.stderr, end="")
+
+else:
+    # kill previous task if it wasn't finished
+    if "_graph_task" in globals() and not _graph_task.done():
+        _graph_task.cancel()
+        await asyncio.gather(_graph_task, return_exceptions=True)
+
+    _run_scope = {}
+    exec(compiled, _run_scope)
+
+    app = _run_scope["app"]
+    _graph_task = asyncio.create_task(app.run(exit_after_finish=False))
+
+
+    await asyncio.sleep(0)
+    _started = True
+
+_started
             `);
 
-            stopButton.disabled = false;
+            if (started) {
+                stopButton.disabled = false;
+            } else {
+                runButton.disabled = false;
+            }
 
         } catch (error) {
             console.error(error);
+            appendOutput(String(error));
             runButton.disabled = false;
             stopButton.disabled = true;
         }

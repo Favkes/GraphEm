@@ -10,12 +10,21 @@ async function main() {
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
 
+    // picking and installing the correct version of the wheel file
+    const manifestResponse = await fetch(
+        `${import.meta.env.BASE_URL}dist/wheel.json`
+    );
+    if (!manifestResponse.ok) {
+        throw new Error("Failed to load GraphEm wheel manifest.");;
+    }
+    const { filename } = await manifestResponse.json();
+    const graphemVersion = filename.split("-")[1];
     const wheelUrl = new URL(
-        `${import.meta.env.BASE_URL}dist/graphem-0.1.3-py3-none-any.whl`,
+        `${import.meta.env.BASE_URL}dist/${filename}`,
         window.location.origin
     ).href;
     await micropip.install(wheelUrl);
-    console.log("GraphEm installed! ;)");
+    console.log(`GraphEm v${graphemVersion} installed! ;)`);
 
     const scriptOutput = document.getElementById("console-output");
 

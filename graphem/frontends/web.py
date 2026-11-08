@@ -2,9 +2,9 @@ import asyncio
 from collections.abc import Sequence, Hashable
 from enum import Enum
 # noinspection PyUnresolvedReferences
-from js import document, window
-from pyodide.ffi import create_proxy
+from js import document, window, Event
 from pyodide.ffi import create_proxy, jsnull
+import traceback
 
 from graphem.renderers.web import WebRenderer
 from graphem.interaction.controller import GraphController, DragMode, ToolMode
@@ -33,6 +33,7 @@ class WebApp:
         self.renderer = None
 
         self._user_script = user_script
+        self._script_task = None
         self._next_event = asyncio.Event()
 
         self._edge_colour_fn = None
@@ -200,6 +201,13 @@ class WebApp:
     def tick(self):
         self.render_frame()
 
+    @property
+    def script_finished(self):
+        return (
+            self._script_task is not None
+            and self._script_task.done()
+        )
+
     # Pause user script execution
     async def step(self, block:bool = True):
         self.synchronizer.sync_bound_attributes()
@@ -210,25 +218,45 @@ class WebApp:
             await asyncio.sleep(0)
 
     # Main App entry point
-    async def run(self):
+    async def run(self, exit_after_finish:bool = True):
         self.open()
 
-        task = None
+        self._script_task = None
         if self._user_script is not None:
-            task = asyncio.create_task(self._user_script(self))
+            self._script_task = asyncio.create_task(self._user_script(self))
+
+            def handle_task_result(finished_task):
+                if finished_task.cancelled():
+                    return
+
+                error = finished_task.exception()
+                if error is not None:
+                    traceback.print_exception(error)
+
+                document.dispatchEvent(Event.new("graphem:finished"))
+
+            self._script_task.add_done_callback(handle_task_result)
+
         try:
             while self.running:
                 self.tick()
+
+                if exit_after_finish and self.script_finished:
+                    self.running = False
+
                 await asyncio.sleep(1/60)
 
         finally:
-            if task is not None:
-                task.cancel()
-                await asyncio.gather(task, return_exceptions=True)
+            if self._script_task is not None:
+                self._script_task.cancel()
+                await asyncio.gather(self._script_task, return_exceptions=True)
 
             for target, event_name, proxy in self._proxies:
                 target.removeEventListener(event_name, proxy)
                 proxy.destroy()
+
+            self._proxies.clear()
+            self.running = False
 
     def set_edge_attribute(self, key:Hashable, attr_arr:Sequence,
                            default = None, factory = None):

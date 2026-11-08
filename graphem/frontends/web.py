@@ -200,10 +200,13 @@ class WebApp:
         self.render_frame()
 
     # Pause user script execution
-    async def step(self):
+    async def step(self, block:bool = True):
         self.synchronizer.sync_bound_attributes()
-        self._next_event.clear()
-        await self._next_event.wait()
+        if block:
+            self._next_event.clear()
+            await self._next_event.wait()
+        else:
+            await asyncio.sleep(0)
 
     # Main App entry point
     async def run(self):

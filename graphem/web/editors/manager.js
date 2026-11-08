@@ -13,20 +13,29 @@ export class EditorManager {
     }
 
     async switchEditor(editorType) {
-        const code = this.editor?.getValue() ?? this.initialCode;
+        this.container.setAttribute("aria-busy", "true");
+        if  (this.container.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
 
-        const module = editorType === "monaco"
-            ? await import(`./monaco.js`)
-            : await import(`./codemirror.js`);
+        try {
+            const code = this.editor?.getValue() ?? this.initialCode;
 
-        this.destroyEditor();
-        this.container.replaceChildren();
+            const module = editorType === "monaco"
+                ? await import(`./monaco.js`)
+                : await import(`./codemirror.js`);
 
-        this.editor = await module.createEditor(this.container, code);;
-        this.type = editorType;
+            this.destroyEditor();
+            this.container.replaceChildren();
 
-        localStorage.setItem(STORAGE_KEY, editorType);
-        console.log("Code editor picked: ", editorType);
+            this.editor = await module.createEditor(this.container, code);;
+            this.type = editorType;
+
+            localStorage.setItem(STORAGE_KEY, editorType);
+            console.log("Code editor picked: ", editorType);
+        } finally {
+            this.container.removeAttribute("aria-busy");
+        }
     }
 
     destroyEditor() {

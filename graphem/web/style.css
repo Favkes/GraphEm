@@ -131,6 +131,8 @@ button[aria-pressed="true"] {
     /* box-resizing: border-box; */
     font-family: monospace;
 
+    position: relative;
+
     color: #fff;
     background-color: #111;
     border-radius: 5px;
@@ -145,6 +147,21 @@ button[aria-pressed="true"] {
 
 #python-editor .cm-scroller {
     overflow: auto;
+}
+
+#python-editor[aria-busy="true"] {
+    pointer-events: none;
+}
+#python-editor[aria-busy="true"]::after {
+    content: "Loading editor...";
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    background: #111;
+    z-index: 10;
 }
 
 #code-controls {

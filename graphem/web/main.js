@@ -53,8 +53,17 @@ async function main() {
     const selector = document.getElementById("editor-type");
     selector.value = editorManager.type;
     selector.addEventListener("change", async () => {
-        console.log("Changing code editor...");
-        await editorManager.switchEditor(selector.value);
+        selector.disabled = true;
+
+        try {
+            console.log("Changing code editor...");
+            await editorManager.switchEditor(selector.value);
+        } catch (error) {
+            console.error(error);
+            selector.value = editorManager.type;
+        } finally {
+            selector.disabled = false;
+        }
     });
 
 
